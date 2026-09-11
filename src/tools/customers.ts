@@ -3,13 +3,15 @@ import { z } from 'zod'
 import type { GraphQLClient } from '../graphql/client.js'
 
 export function registerCustomerTools(server: McpServer, client: GraphQLClient) {
-  server.tool(
+  server.registerTool(
     'shopify_customers_list',
-    'List customers with optional search filter and pagination',
     {
-      query: z.string().optional().describe('Search query to filter customers'),
-      first: z.number().optional().describe('Number of customers to return (default 10)'),
-      after: z.string().optional().describe('Cursor for pagination'),
+      description: 'List customers with optional search filter and pagination',
+      inputSchema: {
+        query: z.string().optional().describe('Search query to filter customers'),
+        first: z.number().optional().describe('Number of customers to return (default 10)'),
+        after: z.string().optional().describe('Cursor for pagination'),
+      },
     },
     async ({ query, first, after }) => {
       const variables: Record<string, unknown> = { first: first ?? 10 }
@@ -38,11 +40,13 @@ export function registerCustomerTools(server: McpServer, client: GraphQLClient) 
     },
   )
 
-  server.tool(
+  server.registerTool(
     'shopify_customer_get',
-    'Get a single customer by ID',
     {
-      id: z.string().describe('Customer GID'),
+      description: 'Get a single customer by ID',
+      inputSchema: {
+        id: z.string().describe('Customer GID'),
+      },
     },
     async ({ id }) => {
       const result = await client.execute(
@@ -68,17 +72,19 @@ export function registerCustomerTools(server: McpServer, client: GraphQLClient) 
     },
   )
 
-  server.tool(
+  server.registerTool(
     'shopify_customer_update',
-    'Update a customer',
     {
-      id: z.string().describe('Customer GID'),
-      firstName: z.string().optional(),
-      lastName: z.string().optional(),
-      email: z.string().optional(),
-      phone: z.string().optional(),
-      tags: z.array(z.string()).optional(),
-      note: z.string().optional(),
+      description: 'Update a customer',
+      inputSchema: {
+        id: z.string().describe('Customer GID'),
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
+        email: z.string().optional(),
+        phone: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        note: z.string().optional(),
+      },
     },
     async (params) => {
       const input: Record<string, unknown> = { id: params.id }

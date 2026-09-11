@@ -3,11 +3,13 @@ import { z } from 'zod'
 import type { GraphQLClient } from '../graphql/client.js'
 
 export function registerInventoryTools(server: McpServer, client: GraphQLClient) {
-  server.tool(
+  server.registerTool(
     'shopify_inventory_get_levels',
-    'Get inventory levels for an inventory item across all locations',
     {
-      inventoryItemId: z.string().describe('Inventory item GID'),
+      description: 'Get inventory levels for an inventory item across all locations',
+      inputSchema: {
+        inventoryItemId: z.string().describe('Inventory item GID'),
+      },
     },
     async ({ inventoryItemId }) => {
       const result = await client.execute(
@@ -31,13 +33,15 @@ export function registerInventoryTools(server: McpServer, client: GraphQLClient)
     },
   )
 
-  server.tool(
+  server.registerTool(
     'shopify_inventory_adjust',
-    'Adjust inventory quantity at a specific location',
     {
-      inventoryItemId: z.string().describe('Inventory item GID'),
-      locationId: z.string().describe('Location GID'),
-      delta: z.number().describe('Quantity change (positive to add, negative to remove)'),
+      description: 'Adjust inventory quantity at a specific location',
+      inputSchema: {
+        inventoryItemId: z.string().describe('Inventory item GID'),
+        locationId: z.string().describe('Location GID'),
+        delta: z.number().describe('Quantity change (positive to add, negative to remove)'),
+      },
     },
     async ({ inventoryItemId, locationId, delta }) => {
       const result = await client.execute(

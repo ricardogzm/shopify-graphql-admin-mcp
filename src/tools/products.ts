@@ -3,13 +3,15 @@ import { z } from 'zod'
 import type { GraphQLClient } from '../graphql/client.js'
 
 export function registerProductTools(server: McpServer, client: GraphQLClient) {
-  server.tool(
+  server.registerTool(
     'shopify_products_list',
-    'List products with optional search filter and pagination',
     {
-      query: z.string().optional().describe('Search query to filter products'),
-      first: z.number().optional().describe('Number of products to return (default 10)'),
-      after: z.string().optional().describe('Cursor for pagination'),
+      description: 'List products with optional search filter and pagination',
+      inputSchema: {
+        query: z.string().optional().describe('Search query to filter products'),
+        first: z.number().optional().describe('Number of products to return (default 10)'),
+        after: z.string().optional().describe('Cursor for pagination'),
+      },
     },
     async ({ query, first, after }) => {
       const variables: Record<string, unknown> = { first: first ?? 10 }
@@ -38,11 +40,13 @@ export function registerProductTools(server: McpServer, client: GraphQLClient) {
     },
   )
 
-  server.tool(
+  server.registerTool(
     'shopify_product_get',
-    'Get a single product by ID',
     {
-      id: z.string().describe('Product GID (e.g. gid://shopify/Product/123)'),
+      description: 'Get a single product by ID',
+      inputSchema: {
+        id: z.string().describe('Product GID (e.g. gid://shopify/Product/123)'),
+      },
     },
     async ({ id }) => {
       const result = await client.execute(
@@ -67,16 +71,18 @@ export function registerProductTools(server: McpServer, client: GraphQLClient) {
     },
   )
 
-  server.tool(
+  server.registerTool(
     'shopify_product_create',
-    'Create a new product',
     {
-      title: z.string().describe('Product title'),
-      descriptionHtml: z.string().optional().describe('Product description in HTML'),
-      vendor: z.string().optional().describe('Product vendor'),
-      productType: z.string().optional().describe('Product type'),
-      tags: z.array(z.string()).optional().describe('Product tags'),
-      status: z.enum(['ACTIVE', 'DRAFT', 'ARCHIVED']).optional().describe('Product status'),
+      description: 'Create a new product',
+      inputSchema: {
+        title: z.string().describe('Product title'),
+        descriptionHtml: z.string().optional().describe('Product description in HTML'),
+        vendor: z.string().optional().describe('Product vendor'),
+        productType: z.string().optional().describe('Product type'),
+        tags: z.array(z.string()).optional().describe('Product tags'),
+        status: z.enum(['ACTIVE', 'DRAFT', 'ARCHIVED']).optional().describe('Product status'),
+      },
     },
     async (params) => {
       const input: Record<string, unknown> = { title: params.title }
@@ -99,17 +105,19 @@ export function registerProductTools(server: McpServer, client: GraphQLClient) {
     },
   )
 
-  server.tool(
+  server.registerTool(
     'shopify_product_update',
-    'Update an existing product',
     {
-      id: z.string().describe('Product GID'),
-      title: z.string().optional().describe('Product title'),
-      descriptionHtml: z.string().optional().describe('Product description in HTML'),
-      vendor: z.string().optional().describe('Product vendor'),
-      productType: z.string().optional().describe('Product type'),
-      tags: z.array(z.string()).optional().describe('Product tags'),
-      status: z.enum(['ACTIVE', 'DRAFT', 'ARCHIVED']).optional().describe('Product status'),
+      description: 'Update an existing product',
+      inputSchema: {
+        id: z.string().describe('Product GID'),
+        title: z.string().optional().describe('Product title'),
+        descriptionHtml: z.string().optional().describe('Product description in HTML'),
+        vendor: z.string().optional().describe('Product vendor'),
+        productType: z.string().optional().describe('Product type'),
+        tags: z.array(z.string()).optional().describe('Product tags'),
+        status: z.enum(['ACTIVE', 'DRAFT', 'ARCHIVED']).optional().describe('Product status'),
+      },
     },
     async (params) => {
       const input: Record<string, unknown> = { id: params.id }
@@ -133,11 +141,13 @@ export function registerProductTools(server: McpServer, client: GraphQLClient) {
     },
   )
 
-  server.tool(
+  server.registerTool(
     'shopify_product_delete',
-    'Delete a product',
     {
-      id: z.string().describe('Product GID to delete'),
+      description: 'Delete a product',
+      inputSchema: {
+        id: z.string().describe('Product GID to delete'),
+      },
     },
     async ({ id }) => {
       const result = await client.execute(

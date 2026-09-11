@@ -3,15 +3,18 @@ import { z } from 'zod'
 import type { GraphQLClient } from '../graphql/client.js'
 
 export function registerGraphQLProxy(server: McpServer, client: GraphQLClient) {
-  server.tool(
+  server.registerTool(
     'shopify_graphql',
-    'Execute a raw GraphQL query or mutation against the Shopify Admin API. Use shopify_schema_search to discover available queries, mutations, and types first.',
     {
-      query: z.string().describe('The GraphQL query or mutation string'),
-      variables: z
-        .record(z.string(), z.unknown())
-        .optional()
-        .describe('Optional variables object for the query'),
+      description:
+        'Execute a raw GraphQL query or mutation against the Shopify Admin API. Use shopify_schema_search to discover available queries, mutations, and types first.',
+      inputSchema: {
+        query: z.string().describe('The GraphQL query or mutation string'),
+        variables: z
+          .record(z.string(), z.unknown())
+          .optional()
+          .describe('Optional variables object for the query'),
+      },
     },
     async ({ query, variables }) => {
       try {

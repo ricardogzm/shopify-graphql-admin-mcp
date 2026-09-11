@@ -3,15 +3,18 @@ import { z } from 'zod'
 import type { SchemaIndex } from '../graphql/schema-index.js'
 
 export function registerSchemaSearch(server: McpServer, schemaIndex: SchemaIndex) {
-  server.tool(
+  server.registerTool(
     'shopify_schema_search',
-    "Search the Shopify Admin GraphQL schema by keyword. Returns matching types, queries, and mutations. Use this to discover what's available before writing queries.",
     {
-      query: z.string().describe('Search keyword (e.g. "metaobject", "product", "collection")'),
-      filter: z
-        .enum(['all', 'types', 'queries', 'mutations'])
-        .optional()
-        .describe('Filter results by category (default: all)'),
+      description:
+        "Search the Shopify Admin GraphQL schema by keyword. Returns matching types, queries, and mutations. Use this to discover what's available before writing queries.",
+      inputSchema: {
+        query: z.string().describe('Search keyword (e.g. "metaobject", "product", "collection")'),
+        filter: z
+          .enum(['all', 'types', 'queries', 'mutations'])
+          .optional()
+          .describe('Filter results by category (default: all)'),
+      },
     },
     async ({ query, filter }) => {
       const results = schemaIndex.search(query, filter ?? 'all')
@@ -57,15 +60,18 @@ export function registerSchemaSearch(server: McpServer, schemaIndex: SchemaIndex
     },
   )
 
-  server.tool(
+  server.registerTool(
     'shopify_schema_details',
-    'Get complete details for a specific GraphQL type, query, or mutation including all fields, arguments, and nested types.',
     {
-      name: z
-        .string()
-        .describe(
-          'Exact name of the type, query, or mutation (e.g. "Product", "productCreate", "MetaobjectInput")',
-        ),
+      description:
+        'Get complete details for a specific GraphQL type, query, or mutation including all fields, arguments, and nested types.',
+      inputSchema: {
+        name: z
+          .string()
+          .describe(
+            'Exact name of the type, query, or mutation (e.g. "Product", "productCreate", "MetaobjectInput")',
+          ),
+      },
     },
     async ({ name }) => {
       const details = schemaIndex.getDetails(name)
