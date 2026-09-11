@@ -27,7 +27,7 @@ export function parseArgs(argv: string[]): Config {
   const apiVersion =
     getArg(argv, "--api-version") ??
     process.env.SHOPIFY_API_VERSION ??
-    "2025-01";
+    "2026-07";
 
   if (!store) {
     console.error(

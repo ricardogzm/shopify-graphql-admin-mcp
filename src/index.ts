@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { loadEnvFile } from "node:process";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { parseArgs } from "./utils/cli.js";
 import { AuthProvider } from "./auth/provider.js";
@@ -7,6 +8,14 @@ import { GraphQLClient } from "./graphql/client.js";
 import { runIntrospection } from "./graphql/introspection.js";
 import { SchemaIndex } from "./graphql/schema-index.js";
 import { createServer } from "./server.js";
+
+try {
+  loadEnvFile();
+} catch (error) {
+  if (!(error instanceof Error) || (error as NodeJS.ErrnoException).code !== "ENOENT") {
+    throw error;
+  }
+}
 
 async function main() {
   const config = parseArgs(process.argv);

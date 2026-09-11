@@ -143,7 +143,7 @@ npx shopify-graphql-admin-mcp \
 | `--access-token` | `SHOPIFY_ACCESS_TOKEN` | Legacy access token (`shpat_...`) |
 | `--client-id` | `SHOPIFY_CLIENT_ID` | OAuth client ID |
 | `--client-secret` | `SHOPIFY_CLIENT_SECRET` | OAuth client secret |
-| `--api-version` | `SHOPIFY_API_VERSION` | API version (default: `2025-01`) |
+| `--api-version` | `SHOPIFY_API_VERSION` | API version (default: `2026-07`) |
 
 ## Usage with Claude Code
 
