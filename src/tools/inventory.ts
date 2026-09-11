@@ -1,16 +1,13 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import type { GraphQLClient } from "../graphql/client.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+import type { GraphQLClient } from '../graphql/client.js'
 
-export function registerInventoryTools(
-  server: McpServer,
-  client: GraphQLClient
-) {
+export function registerInventoryTools(server: McpServer, client: GraphQLClient) {
   server.tool(
-    "shopify_inventory_get_levels",
-    "Get inventory levels for an inventory item across all locations",
+    'shopify_inventory_get_levels',
+    'Get inventory levels for an inventory item across all locations',
     {
-      inventoryItemId: z.string().describe("Inventory item GID"),
+      inventoryItemId: z.string().describe('Inventory item GID'),
     },
     async ({ inventoryItemId }) => {
       const result = await client.execute(
@@ -28,19 +25,19 @@ export function registerInventoryTools(
             }
           }
         }`,
-        { id: inventoryItemId }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { id: inventoryItemId },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_inventory_adjust",
-    "Adjust inventory quantity at a specific location",
+    'shopify_inventory_adjust',
+    'Adjust inventory quantity at a specific location',
     {
-      inventoryItemId: z.string().describe("Inventory item GID"),
-      locationId: z.string().describe("Location GID"),
-      delta: z.number().describe("Quantity change (positive to add, negative to remove)"),
+      inventoryItemId: z.string().describe('Inventory item GID'),
+      locationId: z.string().describe('Location GID'),
+      delta: z.number().describe('Quantity change (positive to add, negative to remove)'),
     },
     async ({ inventoryItemId, locationId, delta }) => {
       const result = await client.execute(
@@ -59,8 +56,8 @@ export function registerInventoryTools(
         }`,
         {
           input: {
-            reason: "correction",
-            name: "available",
+            reason: 'correction',
+            name: 'available',
             changes: [
               {
                 inventoryItemId,
@@ -69,9 +66,9 @@ export function registerInventoryTools(
               },
             ],
           },
-        }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 }

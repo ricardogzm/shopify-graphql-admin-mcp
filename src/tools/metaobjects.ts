@@ -1,14 +1,11 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import type { GraphQLClient } from "../graphql/client.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+import type { GraphQLClient } from '../graphql/client.js'
 
-export function registerMetaobjectTools(
-  server: McpServer,
-  client: GraphQLClient
-) {
+export function registerMetaobjectTools(server: McpServer, client: GraphQLClient) {
   server.tool(
-    "shopify_metaobject_definitions_list",
-    "List all metaobject definitions (types) in the store",
+    'shopify_metaobject_definitions_list',
+    'List all metaobject definitions (types) in the store',
     {},
     async () => {
       const result = await client.execute(
@@ -20,26 +17,26 @@ export function registerMetaobjectTools(
               metaobjectsCount
             }
           }
-        }`
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        }`,
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_metaobjects_list",
-    "List metaobject entries of a given type",
+    'shopify_metaobjects_list',
+    'List metaobject entries of a given type',
     {
       type: z.string().describe('Metaobject type (e.g. "school", "conference")'),
-      first: z.number().optional().describe("Number of entries to return (default 20)"),
-      after: z.string().optional().describe("Cursor for pagination"),
+      first: z.number().optional().describe('Number of entries to return (default 20)'),
+      after: z.string().optional().describe('Cursor for pagination'),
     },
     async ({ type, first, after }) => {
       const variables: Record<string, unknown> = {
         type,
         first: first ?? 20,
-      };
-      if (after) variables.after = after;
+      }
+      if (after) variables.after = after
 
       const result = await client.execute(
         `query ($type: String!, $first: Int!, $after: String) {
@@ -55,17 +52,17 @@ export function registerMetaobjectTools(
             pageInfo { hasNextPage endCursor }
           }
         }`,
-        variables
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        variables,
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_metaobject_get",
-    "Get a single metaobject by ID",
+    'shopify_metaobject_get',
+    'Get a single metaobject by ID',
     {
-      id: z.string().describe("Metaobject GID"),
+      id: z.string().describe('Metaobject GID'),
     },
     async ({ id }) => {
       const result = await client.execute(
@@ -76,25 +73,25 @@ export function registerMetaobjectTools(
             updatedAt
           }
         }`,
-        { id }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { id },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_metaobject_create",
-    "Create a new metaobject entry",
+    'shopify_metaobject_create',
+    'Create a new metaobject entry',
     {
       type: z.string().describe('Metaobject type (e.g. "school")'),
-      handle: z.string().optional().describe("URL-friendly handle"),
+      handle: z.string().optional().describe('URL-friendly handle'),
       fields: z
         .array(z.object({ key: z.string(), value: z.string() }))
-        .describe("Array of field key-value pairs"),
+        .describe('Array of field key-value pairs'),
     },
     async ({ type, handle, fields }) => {
-      const metaobject: Record<string, unknown> = { type, fields };
-      if (handle) metaobject.handle = handle;
+      const metaobject: Record<string, unknown> = { type, fields }
+      if (handle) metaobject.handle = handle
 
       const result = await client.execute(
         `mutation ($metaobject: MetaobjectCreateInput!) {
@@ -103,25 +100,25 @@ export function registerMetaobjectTools(
             userErrors { field message code }
           }
         }`,
-        { metaobject }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { metaobject },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_metaobject_update",
-    "Update an existing metaobject entry",
+    'shopify_metaobject_update',
+    'Update an existing metaobject entry',
     {
-      id: z.string().describe("Metaobject GID"),
-      handle: z.string().optional().describe("New handle"),
+      id: z.string().describe('Metaobject GID'),
+      handle: z.string().optional().describe('New handle'),
       fields: z
         .array(z.object({ key: z.string(), value: z.string() }))
-        .describe("Array of field key-value pairs to update"),
+        .describe('Array of field key-value pairs to update'),
     },
     async ({ id, handle, fields }) => {
-      const metaobject: Record<string, unknown> = { fields };
-      if (handle) metaobject.handle = handle;
+      const metaobject: Record<string, unknown> = { fields }
+      if (handle) metaobject.handle = handle
 
       const result = await client.execute(
         `mutation ($id: ID!, $metaobject: MetaobjectUpdateInput!) {
@@ -130,17 +127,17 @@ export function registerMetaobjectTools(
             userErrors { field message code }
           }
         }`,
-        { id, metaobject }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { id, metaobject },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_metaobject_delete",
-    "Delete a metaobject entry",
+    'shopify_metaobject_delete',
+    'Delete a metaobject entry',
     {
-      id: z.string().describe("Metaobject GID to delete"),
+      id: z.string().describe('Metaobject GID to delete'),
     },
     async ({ id }) => {
       const result = await client.execute(
@@ -150,9 +147,9 @@ export function registerMetaobjectTools(
             userErrors { field message code }
           }
         }`,
-        { id }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { id },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 }

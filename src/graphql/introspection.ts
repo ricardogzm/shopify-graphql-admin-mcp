@@ -1,4 +1,4 @@
-import type { GraphQLClient } from "./client.js";
+import type { GraphQLClient } from './client.js'
 
 const INTROSPECTION_QUERY = `
 query IntrospectionQuery {
@@ -74,67 +74,62 @@ fragment TypeRef on __Type {
     }
   }
 }
-`;
+`
 
 export interface IntrospectedTypeRef {
-  kind: string;
-  name: string | null;
-  ofType?: IntrospectedTypeRef | null;
+  kind: string
+  name: string | null
+  ofType?: IntrospectedTypeRef | null
 }
 
 export interface IntrospectedField {
-  name: string;
-  description: string | null;
-  args?: IntrospectedArg[];
-  type: IntrospectedTypeRef;
+  name: string
+  description: string | null
+  args?: IntrospectedArg[]
+  type: IntrospectedTypeRef
 }
 
 export interface IntrospectedArg {
-  name: string;
-  description: string | null;
-  type: IntrospectedTypeRef;
-  defaultValue: string | null;
+  name: string
+  description: string | null
+  type: IntrospectedTypeRef
+  defaultValue: string | null
 }
 
 export interface IntrospectedEnumValue {
-  name: string;
-  description: string | null;
+  name: string
+  description: string | null
 }
 
 export interface IntrospectedType {
-  kind: string;
-  name: string;
-  description: string | null;
-  fields: IntrospectedField[] | null;
-  inputFields: IntrospectedArg[] | null;
-  interfaces: IntrospectedTypeRef[] | null;
-  enumValues: IntrospectedEnumValue[] | null;
-  possibleTypes: IntrospectedTypeRef[] | null;
+  kind: string
+  name: string
+  description: string | null
+  fields: IntrospectedField[] | null
+  inputFields: IntrospectedArg[] | null
+  interfaces: IntrospectedTypeRef[] | null
+  enumValues: IntrospectedEnumValue[] | null
+  possibleTypes: IntrospectedTypeRef[] | null
 }
 
 export interface IntrospectedSchema {
-  queryTypeName: string;
-  mutationTypeName: string;
-  types: IntrospectedType[];
+  queryTypeName: string
+  mutationTypeName: string
+  types: IntrospectedType[]
 }
 
-export async function runIntrospection(
-  client: GraphQLClient
-): Promise<IntrospectedSchema> {
-  const res = await client.execute(INTROSPECTION_QUERY);
+export async function runIntrospection(client: GraphQLClient): Promise<IntrospectedSchema> {
+  const res = await client.execute(INTROSPECTION_QUERY)
 
   if (res.errors) {
-    throw new Error(
-      `Introspection failed: ${res.errors.map((e) => e.message).join(", ")}`
-    );
+    throw new Error(`Introspection failed: ${res.errors.map((e) => e.message).join(', ')}`)
   }
 
-  const schema = (res.data as { __schema: Record<string, unknown> }).__schema;
+  const schema = (res.data as { __schema: Record<string, unknown> }).__schema
 
   return {
-    queryTypeName: (schema.queryType as { name: string })?.name ?? "QueryRoot",
-    mutationTypeName:
-      (schema.mutationType as { name: string })?.name ?? "Mutation",
+    queryTypeName: (schema.queryType as { name: string })?.name ?? 'QueryRoot',
+    mutationTypeName: (schema.mutationType as { name: string })?.name ?? 'Mutation',
     types: schema.types as IntrospectedType[],
-  };
+  }
 }

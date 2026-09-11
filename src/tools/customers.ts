@@ -1,23 +1,20 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import type { GraphQLClient } from "../graphql/client.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+import type { GraphQLClient } from '../graphql/client.js'
 
-export function registerCustomerTools(
-  server: McpServer,
-  client: GraphQLClient
-) {
+export function registerCustomerTools(server: McpServer, client: GraphQLClient) {
   server.tool(
-    "shopify_customers_list",
-    "List customers with optional search filter and pagination",
+    'shopify_customers_list',
+    'List customers with optional search filter and pagination',
     {
-      query: z.string().optional().describe("Search query to filter customers"),
-      first: z.number().optional().describe("Number of customers to return (default 10)"),
-      after: z.string().optional().describe("Cursor for pagination"),
+      query: z.string().optional().describe('Search query to filter customers'),
+      first: z.number().optional().describe('Number of customers to return (default 10)'),
+      after: z.string().optional().describe('Cursor for pagination'),
     },
     async ({ query, first, after }) => {
-      const variables: Record<string, unknown> = { first: first ?? 10 };
-      if (query) variables.query = query;
-      if (after) variables.after = after;
+      const variables: Record<string, unknown> = { first: first ?? 10 }
+      if (query) variables.query = query
+      if (after) variables.after = after
 
       const result = await client.execute(
         `query ($first: Int!, $query: String, $after: String) {
@@ -35,17 +32,17 @@ export function registerCustomerTools(
             pageInfo { hasNextPage endCursor }
           }
         }`,
-        variables
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        variables,
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_customer_get",
-    "Get a single customer by ID",
+    'shopify_customer_get',
+    'Get a single customer by ID',
     {
-      id: z.string().describe("Customer GID"),
+      id: z.string().describe('Customer GID'),
     },
     async ({ id }) => {
       const result = await client.execute(
@@ -65,17 +62,17 @@ export function registerCustomerTools(
             createdAt updatedAt
           }
         }`,
-        { id }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { id },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_customer_update",
-    "Update a customer",
+    'shopify_customer_update',
+    'Update a customer',
     {
-      id: z.string().describe("Customer GID"),
+      id: z.string().describe('Customer GID'),
       firstName: z.string().optional(),
       lastName: z.string().optional(),
       email: z.string().optional(),
@@ -84,13 +81,13 @@ export function registerCustomerTools(
       note: z.string().optional(),
     },
     async (params) => {
-      const input: Record<string, unknown> = { id: params.id };
-      if (params.firstName) input.firstName = params.firstName;
-      if (params.lastName) input.lastName = params.lastName;
-      if (params.email) input.email = params.email;
-      if (params.phone) input.phone = params.phone;
-      if (params.tags) input.tags = params.tags;
-      if (params.note) input.note = params.note;
+      const input: Record<string, unknown> = { id: params.id }
+      if (params.firstName) input.firstName = params.firstName
+      if (params.lastName) input.lastName = params.lastName
+      if (params.email) input.email = params.email
+      if (params.phone) input.phone = params.phone
+      if (params.tags) input.tags = params.tags
+      if (params.note) input.note = params.note
 
       const result = await client.execute(
         `mutation ($input: CustomerInput!) {
@@ -99,9 +96,9 @@ export function registerCustomerTools(
             userErrors { field message }
           }
         }`,
-        { input }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { input },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 }

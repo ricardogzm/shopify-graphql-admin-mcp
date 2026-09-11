@@ -1,23 +1,20 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import type { GraphQLClient } from "../graphql/client.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+import type { GraphQLClient } from '../graphql/client.js'
 
-export function registerOrderTools(
-  server: McpServer,
-  client: GraphQLClient
-) {
+export function registerOrderTools(server: McpServer, client: GraphQLClient) {
   server.tool(
-    "shopify_orders_list",
-    "List orders with optional search filter and pagination",
+    'shopify_orders_list',
+    'List orders with optional search filter and pagination',
     {
-      query: z.string().optional().describe("Search query to filter orders"),
-      first: z.number().optional().describe("Number of orders to return (default 10)"),
-      after: z.string().optional().describe("Cursor for pagination"),
+      query: z.string().optional().describe('Search query to filter orders'),
+      first: z.number().optional().describe('Number of orders to return (default 10)'),
+      after: z.string().optional().describe('Cursor for pagination'),
     },
     async ({ query, first, after }) => {
-      const variables: Record<string, unknown> = { first: first ?? 10 };
-      if (query) variables.query = query;
-      if (after) variables.after = after;
+      const variables: Record<string, unknown> = { first: first ?? 10 }
+      if (query) variables.query = query
+      if (after) variables.after = after
 
       const result = await client.execute(
         `query ($first: Int!, $query: String, $after: String) {
@@ -37,17 +34,17 @@ export function registerOrderTools(
             pageInfo { hasNextPage endCursor }
           }
         }`,
-        variables
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        variables,
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_order_get",
-    "Get a single order by ID",
+    'shopify_order_get',
+    'Get a single order by ID',
     {
-      id: z.string().describe("Order GID"),
+      id: z.string().describe('Order GID'),
     },
     async ({ id }) => {
       const result = await client.execute(
@@ -75,9 +72,9 @@ export function registerOrderTools(
             createdAt updatedAt
           }
         }`,
-        { id }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { id },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 }

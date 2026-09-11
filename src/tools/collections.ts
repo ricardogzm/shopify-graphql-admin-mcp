@@ -1,23 +1,20 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
-import type { GraphQLClient } from "../graphql/client.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { z } from 'zod'
+import type { GraphQLClient } from '../graphql/client.js'
 
-export function registerCollectionTools(
-  server: McpServer,
-  client: GraphQLClient
-) {
+export function registerCollectionTools(server: McpServer, client: GraphQLClient) {
   server.tool(
-    "shopify_collections_list",
-    "List collections with optional search filter and pagination",
+    'shopify_collections_list',
+    'List collections with optional search filter and pagination',
     {
-      query: z.string().optional().describe("Search query to filter collections"),
-      first: z.number().optional().describe("Number of collections to return (default 10)"),
-      after: z.string().optional().describe("Cursor for pagination"),
+      query: z.string().optional().describe('Search query to filter collections'),
+      first: z.number().optional().describe('Number of collections to return (default 10)'),
+      after: z.string().optional().describe('Cursor for pagination'),
     },
     async ({ query, first, after }) => {
-      const variables: Record<string, unknown> = { first: first ?? 10 };
-      if (query) variables.query = query;
-      if (after) variables.after = after;
+      const variables: Record<string, unknown> = { first: first ?? 10 }
+      if (query) variables.query = query
+      if (after) variables.after = after
 
       const result = await client.execute(
         `query ($first: Int!, $query: String, $after: String) {
@@ -34,18 +31,18 @@ export function registerCollectionTools(
             pageInfo { hasNextPage endCursor }
           }
         }`,
-        variables
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        variables,
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_collection_get",
-    "Get a single collection by ID with its products",
+    'shopify_collection_get',
+    'Get a single collection by ID with its products',
     {
-      id: z.string().describe("Collection GID"),
-      productsFirst: z.number().optional().describe("Number of products to include (default 10)"),
+      id: z.string().describe('Collection GID'),
+      productsFirst: z.number().optional().describe('Number of products to include (default 10)'),
     },
     async ({ id, productsFirst }) => {
       const result = await client.execute(
@@ -65,18 +62,18 @@ export function registerCollectionTools(
             updatedAt
           }
         }`,
-        { id, productsFirst: productsFirst ?? 10 }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { id, productsFirst: productsFirst ?? 10 },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_collection_create",
-    "Create a new collection",
+    'shopify_collection_create',
+    'Create a new collection',
     {
-      title: z.string().describe("Collection title"),
-      descriptionHtml: z.string().optional().describe("Collection description in HTML"),
+      title: z.string().describe('Collection title'),
+      descriptionHtml: z.string().optional().describe('Collection description in HTML'),
       ruleSet: z
         .object({
           appliedDisjunctively: z.boolean(),
@@ -85,16 +82,16 @@ export function registerCollectionTools(
               column: z.string(),
               relation: z.string(),
               condition: z.string(),
-            })
+            }),
           ),
         })
         .optional()
-        .describe("Smart collection rules"),
+        .describe('Smart collection rules'),
     },
     async (params) => {
-      const input: Record<string, unknown> = { title: params.title };
-      if (params.descriptionHtml) input.descriptionHtml = params.descriptionHtml;
-      if (params.ruleSet) input.ruleSet = params.ruleSet;
+      const input: Record<string, unknown> = { title: params.title }
+      if (params.descriptionHtml) input.descriptionHtml = params.descriptionHtml
+      if (params.ruleSet) input.ruleSet = params.ruleSet
 
       const result = await client.execute(
         `mutation ($input: CollectionInput!) {
@@ -103,24 +100,24 @@ export function registerCollectionTools(
             userErrors { field message }
           }
         }`,
-        { input }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { input },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_collection_update",
-    "Update an existing collection",
+    'shopify_collection_update',
+    'Update an existing collection',
     {
-      id: z.string().describe("Collection GID"),
-      title: z.string().optional().describe("Collection title"),
-      descriptionHtml: z.string().optional().describe("Collection description in HTML"),
+      id: z.string().describe('Collection GID'),
+      title: z.string().optional().describe('Collection title'),
+      descriptionHtml: z.string().optional().describe('Collection description in HTML'),
     },
     async (params) => {
-      const input: Record<string, unknown> = { id: params.id };
-      if (params.title) input.title = params.title;
-      if (params.descriptionHtml) input.descriptionHtml = params.descriptionHtml;
+      const input: Record<string, unknown> = { id: params.id }
+      if (params.title) input.title = params.title
+      if (params.descriptionHtml) input.descriptionHtml = params.descriptionHtml
 
       const result = await client.execute(
         `mutation ($input: CollectionInput!) {
@@ -129,17 +126,17 @@ export function registerCollectionTools(
             userErrors { field message }
           }
         }`,
-        { input }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { input },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 
   server.tool(
-    "shopify_collection_delete",
-    "Delete a collection",
+    'shopify_collection_delete',
+    'Delete a collection',
     {
-      id: z.string().describe("Collection GID to delete"),
+      id: z.string().describe('Collection GID to delete'),
     },
     async ({ id }) => {
       const result = await client.execute(
@@ -149,9 +146,9 @@ export function registerCollectionTools(
             userErrors { field message }
           }
         }`,
-        { input: { id } }
-      );
-      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
-    }
-  );
+        { input: { id } },
+      )
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] }
+    },
+  )
 }
